@@ -1,7 +1,6 @@
 """
 Database storage and atomic lock implementation using SQLite in WAL mode.
 """
-
 import os
 import sqlite3
 from datetime import datetime, timezone, timedelta
@@ -11,10 +10,6 @@ from queuectl.models import Job, JobState, current_iso_time, parse_iso_time
 DEFAULT_DB_PATH = os.environ.get("QUEUECTL_DB", "queuectl.db")
 
 def get_db_connection(db_path: str = DEFAULT_DB_PATH) -> sqlite3.Connection:
-    """
-    Establishes a connection to SQLite database with Write-Ahead Logging (WAL)
-    mode enabled, autocommit isolation level, and busy timeout set for robust cross-process concurrency.
-    """
     conn = sqlite3.connect(db_path, timeout=10.0, isolation_level=None)
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA busy_timeout=5000;")
@@ -124,13 +119,6 @@ class Database:
             conn.close()
 
     def claim_job(self, worker_id: str, stale_seconds: float = 10.0) -> Optional[Job]:
-        """
-        Atomically claims the next eligible pending/failed job for execution.
-        
-        ATOMIC LOCKING GUARANTEE:
-        Uses 'BEGIN IMMEDIATE' SQLite transaction. This acquires a RESERVED database lock,
-        preventing any other process/worker from entering write mode or claiming jobs concurrently.
-        """
         conn = self.get_connection()
         try:
             now_iso = current_iso_time()
@@ -241,9 +229,7 @@ class Database:
 
     def fail_job(self, job_id: str, backoff_base: float = 2.0) -> str:
         """
-        Handles job failure. If attempts >= max_retries, transitions to 'dead' (DLQ).
-        Otherwise transitions to 'failed' with exponential backoff delay.
-        Returns the new state ('failed' or 'dead').
+        Handles job failure. 
         """
         conn = self.get_connection()
         try:
@@ -325,10 +311,6 @@ class Database:
             conn.close()
 
     def retry_dlq_job(self, job_id: str) -> bool:
-        """
-        Re-enqueues a dead job back to pending state.
-        Resets attempts to 0 so it receives a fresh set of retry attempts.
-        """
         conn = self.get_connection()
         try:
             now_iso = current_iso_time()
