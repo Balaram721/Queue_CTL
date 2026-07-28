@@ -1,8 +1,7 @@
 import uuid
 from typing import List, Optional, Dict, Any
-from Queue_CTL.queuectl.db import Database, DEFAULT_DB_PATH
+from queuectl.db import Database, DEFAULT_DB_PATH
 from queuectl.models import Job, JobState, current_iso_time
-
 
 class QueueManager:
     def __init__(self, db_path: str = DEFAULT_DB_PATH):
