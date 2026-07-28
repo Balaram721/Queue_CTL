@@ -8,7 +8,6 @@ Tests all 5 critical evaluation scenarios using Python's standard unittest frame
 4. SIGKILL crash recovery mid-job & stale job recovery under 60 seconds.
 5. Persistence across restarts & process crashes.
 """
-
 import os
 import sys
 import time
@@ -18,11 +17,10 @@ import threading
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from Queue_CTL.queuectl.db import Database, init_db
+from queuectl.db import Database, init_db
 from queuectl.models import Job, JobState
-from Queue_CTL.queuectl.queue import QueueManager
-from Queue_CTL.queuectl.worker import WorkerRunner
-
+from queuectl.queue import QueueManager
+from queuectl.worker import WorkerRunner
 
 class TestQueueCTL(unittest.TestCase):
     def setUp(self):
