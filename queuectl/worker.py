@@ -5,19 +5,15 @@ import signal
 import threading
 import subprocess
 from typing import List
-from Queue_CTL.queuectl.db import Database, DEFAULT_DB_PATH
+from queuectl.db import Database, DEFAULT_DB_PATH
 from queuectl.models import Job, JobState
-
-# Global shutdown flag across worker threads
 shutdown_requested = False
-
 
 def signal_handler(signum, frame):
     global shutdown_requested
     sys.stderr.write(f"\n[queuectl worker] Received signal {signum}. Initiating graceful shutdown...\n")
     sys.stderr.flush()
     shutdown_requested = True
-
 
 class WorkerRunner:
     def __init__(self, db_path: str = DEFAULT_DB_PATH, worker_id: str = ""):
@@ -83,10 +79,6 @@ class WorkerRunner:
 
 
 def start_workers(count: int = 1, db_path: str = DEFAULT_DB_PATH):
-    """
-    Starts `count` worker threads in the foreground.
-    Registers SIGINT and SIGTERM signal handlers for graceful shutdown.
-    """
     global shutdown_requested
     shutdown_requested = False
 
