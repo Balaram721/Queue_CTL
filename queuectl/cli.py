@@ -1,22 +1,17 @@
 """
 Command Line Interface (CLI) implementation for QueueCTL.
 """
-
 import sys
 import os
 import re
 import json
 import argparse
 from typing import List, Optional
-from Queue_CTL.queuectl.queue import QueueManager
-from Queue_CTL.queuectl.worker import start_workers
+from queuectl.queue import QueueManager
+from queuectl.worker import start_workers
 
 
 def parse_enqueue_arg(raw_arg: str) -> dict:
-    """
-    Parses raw JSON string argument for queuectl enqueue.
-    Handles standard JSON and PowerShell-mangled unquoted JSON representations.
-    """
     if not raw_arg:
         return {}
 
